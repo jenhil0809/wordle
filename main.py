@@ -47,7 +47,7 @@ class Game:
     def get_guess(self):
         guess = ""
         while (len(guess) != self.master.length or zipf_frequency(guess, "en") == 0.0 or
-               guess.upper() in self.guesses):
+               guess.upper() in self.guesses or not guess.isalpha()):
             guess = input("Guess: ")
         self.guesses.append(guess.upper())
         self.master.set_guessed_word(guess)

@@ -1,4 +1,4 @@
-from wordfreq import top_n_list, zipf_frequency
+from wordfreq import zipf_frequency, top_n_list
 from random import choice
 from colorama import Fore
 

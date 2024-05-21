@@ -32,37 +32,25 @@ class Wordle:
 
 
 class Game:
-    def __init__(self, master):
+    def __init__(self, master, guess_num: int = 6):
         self.master = master
+        self.guess_num = guess_num
         self.guesses = []
+        self.interface = Interface()
         self.play_game()
 
     def play_game(self):
         self.get_guess()
-        while len(self.guesses) < 6 and not self.master.matches()[0]:
+        while len(self.guesses) < self.guess_num and not self.master.matches()[0]:
             self.get_guess()
         print(f"Answer={self.master.secret_word}\n\n")
         self.reset_game()
 
     def get_guess(self):
-        guess = ""
-        while (len(guess) != self.master.length or zipf_frequency(guess, "en") == 0.0 or
-               guess.upper() in self.guesses or not guess.isalpha()):
-            guess = input("Guess: ")
+        guess = self.interface.get_guess(self.master.length, self.guesses)
         self.guesses.append(guess.upper())
         self.master.set_guessed_word(guess)
-        self.print_guess(guess)
-
-    def print_guess(self, guess):
-        matches = self.master.matches()[1]
-        for i in range(len(guess)):
-            if matches[i][1] == 0:
-                print(f"{Fore.RED}{guess[i].upper()}{Fore.WHITE}", end="")
-            elif matches[i][1] == 1:
-                print(f"{Fore.YELLOW}{guess[i].upper()}{Fore.WHITE}", end="")
-            else:
-                print(f"{Fore.GREEN}{guess[i].upper()}{Fore.WHITE}", end="")
-        print("\n")
+        self.interface.print_guess(guess, self.master.matches()[1])
 
     def reset_game(self):
         self.guesses = []
@@ -70,4 +58,28 @@ class Game:
         self.play_game()
 
 
-game = (Wordle(5))
+class Interface:
+    def __init__(self):
+        self.matches = []
+
+    def print_guess(self, guess, matches):
+        self.matches = matches
+        for i in range(len(guess)):
+            if self.matches[i][1] == 0:
+                print(f"{Fore.RED}{guess[i].upper()}{Fore.WHITE}", end="")
+            elif self.matches[i][1] == 1:
+                print(f"{Fore.YELLOW}{guess[i].upper()}{Fore.WHITE}", end="")
+            else:
+                print(f"{Fore.GREEN}{guess[i].upper()}{Fore.WHITE}", end="")
+        print("\n")
+
+    def get_guess(self, length, guesses):
+        guess = ""
+        while (len(guess) != length or zipf_frequency(guess, "en") == 0.0 or
+               guess.upper() in guesses or not guess.isalpha()):
+            guess = input("Guess: ")
+        return guess
+
+
+if __name__ == "__main__":
+    game = (Wordle(5))

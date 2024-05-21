@@ -57,11 +57,11 @@ class Game:
         matches = self.master.matches()[1]
         for i in range(len(guess)):
             if matches[i][1] == 0:
-                print(f"{Fore.BLACK}{guess[i]}{Fore.BLACK}", end="")
+                print(f"{Fore.RED}{guess[i].upper()}{Fore.WHITE}", end="")
             elif matches[i][1] == 1:
-                print(f"{Fore.YELLOW}{guess[i]}{Fore.BLACK}", end="")
+                print(f"{Fore.YELLOW}{guess[i].upper()}{Fore.WHITE}", end="")
             else:
-                print(f"{Fore.GREEN}{guess[i]}{Fore.BLACK}", end="")
+                print(f"{Fore.GREEN}{guess[i].upper()}{Fore.WHITE}", end="")
         print("\n")
 
     def reset_game(self):

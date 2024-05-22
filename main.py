@@ -11,7 +11,7 @@ class Wordle:
                              if len(word) == self.length and "'" not in word]
         self._secret_word = ""
         self.set_secret_word()
-        self._guessed_word = " "*self.length
+        self._guessed_word = " " * self.length
         self.game = Game(self, guess_num)
 
     def set_secret_word(self):
@@ -45,30 +45,16 @@ class Game:
         self.master = master
         self.guess_num = guess_num
         self.guesses = []
-        self.interface = Interface()
-
-    def play_game(self):
-        guess = self.interface.get_guess(self.master.length, self.guesses, self.master.lang)
-        self.guesses.append(guess.upper())
-        self.master.set_guessed_word(guess)
-        self.interface.print_guess(guess, self.master.matches)
-        while len(self.guesses) < self.guess_num and not self.master.finished:
-            guess = self.interface.get_guess(self.master.length, self.guesses, self.master.lang)
-            self.guesses.append(guess.upper())
-            self.master.set_guessed_word(guess)
-            self.interface.print_guess(guess, self.master.matches)
-        print(f"Answer={self.master.get_secret_word()}\n\n")
-        self.reset_game()
 
     def reset_game(self):
         self.guesses = []
         self.master.set_secret_word()
-        self.play_game()
 
 
 class Interface:
-    def __init__(self):
+    def __init__(self, master: Game):
         self.matches = []
+        self.master = master
 
     def print_guess(self, guess, matches):
         self.matches = matches
@@ -81,15 +67,28 @@ class Interface:
                 print(f"{Fore.GREEN}{guess[i].upper()}{Fore.WHITE}", end="")
         print("\n")
 
-    @staticmethod
-    def get_guess(length, guesses, lang):
+    def play_game(self):
+        self.get_guess(self.master.master.length, self.master.guesses, self.master.master.lang)
+        while len(self.master.guesses) < self.master.guess_num and not self.master.master.finished:
+            self.get_guess(self.master.master.length, self.master.guesses, self.master.master.lang)
+        self.end_game()
+
+    def get_guess(self, length, guesses, lang):
         guess = ""
         while (len(guess) != length or zipf_frequency(guess, lang) == 0.0 or
                guess.upper() in guesses or not guess.isalpha()):
             guess = input("Guess: ")
-        return guess
+        self.master.guesses.append(guess.upper())
+        self.master.master.set_guessed_word(guess)
+        self.print_guess(guess, self.master.master.matches)
+
+    def end_game(self):
+        print(f"Answer={Fore.GREEN}{self.master.master.get_secret_word()}{Fore.WHITE}")
+        self.master.reset_game()
+        self.play_game()
 
 
 if __name__ == "__main__":
-    game = Wordle(7, 6, "en")
-    game.game.play_game()
+    game = Wordle(5, 3, "en")
+    interface = Interface(game.game)
+    interface.play_game()

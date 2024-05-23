@@ -1,12 +1,12 @@
 import main
 import tkinter as tk
-
+from time import sleep
 
 class GameApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title = "Wordle"
-        self.game = main.Wordle(5, 5, "en")
+        self.game = main.Wordle(5, 6, "en")
         self.guess = tk.StringVar()
         self.screen = Game(self)
         self.screen.pack()
@@ -42,7 +42,10 @@ class Game(tk.Frame):
                 self.reset()
 
     def reset(self):
+        self.master.screen.update_idletasks()
+        sleep(2)
         self.place_widgets()
+        self.answer.config(text="")
         self.master.game.game.reset_game()
         for square in self.squares:
             square.config(bg="light gray")
